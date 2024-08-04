@@ -1,0 +1,84 @@
+import random
+
+def himmelblau(x, y):
+    return (x**2 + y - 11)**2 + (x + y**2 - 7)**2
+
+def generate_initial(size):
+    return [(random.uniform(-5, 5), random.uniform(-5, 5)) for _ in range(size)]
+
+def evolve_(population, mutation_rate):
+    new_population = []
+    for i in range(len(population)):
+        parent1, parent2 = random.sample(population, 2)
+        crossover_point = random.random()
+        child = (
+            crossover_point * parent1[0] + (1 - crossover_point) * parent2[0],
+            crossover_point * parent1[1] + (1 - crossover_point) * parent2[1]
+        )
+        if random.random() < mutation_rate:
+            child = (child[0] + random.uniform(-0.5, 0.5), child[1] + random.uniform(-0.5, 0.5))
+        new_population.append(child)
+    return new_population
+
+# Parameters
+population_size = 50
+generations = 100
+mutation_rate = 0.1
+
+# Initialize population
+population = generate_initial_population(population_size)
+
+# Main loop for the evolutionary algorithm
+for generation in range(generations):
+    # Evaluate the fitness of each individual in the population
+    fitness_scores = [himmelblau(x, y) for (x, y) in population]
+
+    # Find the best solution in the current population
+    best_solution_index = fitness_scores.index(min(fitness_scores))
+    best_solution = population[best_solution_index]
+    best_fitness = fitness_scores[best_solution_index]
+
+    # Evolve the population
+    population = evolve_population(population, mutation_rate)
+
+    # Print progress
+    print(f"Generation {generation + 1}/{generations}: Best Fitness = {best_fitness}")
+
+print(f"\nOptimal Solution: {best_solution}")
+print(f"Optimal Fitness: {best_fitness}")
+
+
+
+import random
+def objective_function(x, y):
+    return (x**2 + y - 11)**2 + (x + y**2 - 7)**2
+lower_bound = [-10, -10]
+upper_bound = [10, 10]
+population_size = 20
+alpha = 0.5  
+max_iterations = 100
+population = [[random.uniform(l, u) for l, u in zip(lower_bound, upper_bound)] for _ in range(population_size)]
+
+for _ in range(max_iterations):
+    
+    fitness = [objective_function(x[0], x[1]) for x in population]
+    best_individual = population[fitness.index(min(fitness))]
+    centroid = [sum(p[i] for p in population) / len(population) for i in range(len(best_individual))]
+
+    new_population = []
+    for _ in range(population_size):
+       
+        displacement = [random.uniform(-alpha, alpha) for _ in range(len(centroid))]
+
+     
+        new_individual = [centroid[i] + displacement[i] for i in range(len(centroid))]
+        for i in range(len(new_individual)):
+            new_individual[i] = max(lower_bound[i], min(upper_bound[i], new_individual[i]))
+
+        new_population.append(new_individual)
+    population = new_population
+best_fitness = min(fitness)
+best_solution = population[fitness.index(best_fitness)]
+print(f"Minimum fitness: {best_fitness}")
+print(f"Solution: x = {best_solution[0]}, y = {best_solution[1]}")
+
